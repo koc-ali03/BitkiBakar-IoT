@@ -1,0 +1,4 @@
+<Files sensitive_data.php>
+    order deny,allow
+    deny from all
+</Files>
