@@ -6,12 +6,6 @@
 
 #include "nodemcuConfig.h"
 
-// Wi-Fi credentials
-const char* ssid = WIFI_SSID;
-const char* password = WIFI_PASSWORD;
-const char* serverUrl  = "http://cloud.aliko.cc/upload.php";
-const char* apiKey = API_KEY;
-
 // Pin Definitions
 #define DHTPIN D5
 #define DHTTYPE DHT11
@@ -32,7 +26,7 @@ WiFiClient client;
 void setup() {
   Serial.begin(9600);
 
-  WiFi.begin(ssid, password);
+  WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     delay(1000);
     Serial.println("WiFi bağlantısı kuruluyor...");
@@ -83,7 +77,7 @@ void loop() {
   Serial.print(soilValue);
   Serial.print(", LDR: ");
   Serial.print(ldrValue);
-  Serial.print(", Ga<: ");
+  Serial.print(", Gaz: ");
   Serial.print(gasValue);
   Serial.print(", Yağmur: ");
   Serial.println(rainValue == LOW ? "Yağmur yok" : "Yağmur yağıyor");
@@ -91,17 +85,17 @@ void loop() {
   // Ardından sunucuya verileri gönder
   if (WiFi.status() == WL_CONNECTED) {
     HTTPClient http;
-    http.begin(client, serverUrl);
+    http.begin(client, SERVER_URL);
     http.addHeader("Content-Type", "application/json");
-    http.addHeader("API-Key", apiKey);
+    http.addHeader("API-Key", API_KEY);
 
     StaticJsonDocument<200> json;
     json["temperature"] = temperature;
     json["humidity"] = humidity;
     json["soil_moisture"] = soilValue;
-    json["ldr_value"] = ldrValue;
-    json["gas_value"] = gasValue;
-    json["rain_status"] = (rainValue == LOW ? 0 : 1);
+    json["ldr"] = ldrValue;
+    json["gas_sensor"] = gasValue;
+    json["rain_sensor"] = (rainValue == LOW ? 0 : 1);
 
     String requestBody;
     serializeJson(json, requestBody);
